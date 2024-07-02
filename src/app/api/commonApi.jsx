@@ -2,6 +2,7 @@
 
 import db from '../config/db';
 import { NextResponse } from "next/server";
+import { auth } from '@/auth';
 
 export async function getUserData() {
   try {
@@ -30,13 +31,18 @@ export const execQuery = async (query) => {
           reject(error);
         }
         resolve(results);
-        console.log('execQuery results', results);
+        // console.log('execQuery results', results);
       });
     });
-    return results;
+    return JSON.parse(JSON.stringify(results));
 
   } catch (error) {
     console.error('execQuery error', error);
     return NextResponse.error(error);
   }
+}
+
+export const getSessionData = async () => {
+  const result = await auth();
+  return result;
 }
