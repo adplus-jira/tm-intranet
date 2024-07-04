@@ -3,8 +3,13 @@ import { NextResponse } from 'next/server';
 
 export async function DELETE (request, context) {
   const { id } = context.params;
-  console.log("!!!", id);
   const res = await execQuery(`DELETE FROM user WHERE idx = '${id}'`);
+  return NextResponse.json(res);
+}
+
+export async function PUT (request, context) {
+  const { id } = context.params;
+  const res = await execQuery(`UPDATE user SET disable_at = NOW() WHERE idx = '${id}'`);
   return NextResponse.json(res);
 }
 
