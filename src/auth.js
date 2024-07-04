@@ -7,13 +7,14 @@ export const { signIn, signOut, handlers, auth } = NextAuth({
   providers: [
     Credentials({
       credentials: {
-        id: {},
-        name: {},
+        idx: '',
+        id: '',
+        name: '',
         isAdmin: false
       },
       authorize: async (credentials) => {
         if(credentials.id && credentials.name) {
-          return { id: credentials.id, name: credentials.name, isAdmin: credentials.isAdmin };
+          return { idx: credentials.idx, id: credentials.id, name: credentials.name, isAdmin: credentials.isAdmin };
         }
         return null;
       },

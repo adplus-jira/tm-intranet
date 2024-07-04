@@ -14,5 +14,6 @@ export async function POST(req, res) {
   });
   
   const result = await execQuery(`INSERT INTO target (naver_id, blog_id, phone) VALUES ${sql.join(',')}`);
+  
   return Response.json(result);
 }

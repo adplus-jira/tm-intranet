@@ -15,6 +15,7 @@ function Header() {
           <div onClick={() => router.push('/user')}>유저관리</div>
           <div onClick={() => router.push('/target')}>타겟관리</div>
           <div onClick={() => router.push('/call')}>콜관리</div>
+          <div onClick={() => router.push('/talk')}>톡관리</div>
           <div onClick={() => signOut()}>로그아웃</div>
         </div>
       </div>

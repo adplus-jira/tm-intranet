@@ -10,9 +10,10 @@ export async function authenticate(prevState, formData) {
   if (loginRes.length === 0) {
     // throw new Error(JSON.stringify({ message: 'Invalid credentials', error: true }));
   } else {
-    const user = { id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
+    const user = { idx: loginRes[0].idx, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
     await signIn('credentials', {
       id: user.id,
+      idx: user.idx,
       name: user.name,
       isAdmin: user.isAdmin,
       redirect: false
