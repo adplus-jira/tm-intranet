@@ -1,10 +1,10 @@
 import { revalidateTag } from "next/cache";
 import Header from "../components/Header";
-import { Input } from "@/components/ui/input";
 import { AddBlockTargetComponent, AddTargetComponent, TargetList } from "./components";
+import { auth } from "@/auth";
 
 export default async function Page() {
-
+  const session = await auth();
   const targetDatas = await fetch(process.env.URL + '/api/target', { method: 'GET', next: { tags: ["target"] } }).then(res => res.json()).then(data => data.data);
   const targets = targetDatas.map((targetData, index) => {
     return {
@@ -69,7 +69,7 @@ export default async function Page() {
 
   return (
     <div>
-      <Header />
+      <Header session={session} />
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
         {/* <div>
           <h1 className="w-full border-b-1">타겟 단건 등록</h1>

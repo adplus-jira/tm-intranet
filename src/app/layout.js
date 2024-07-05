@@ -1,5 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
+import AuthWrapper from "./auth_wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -11,7 +12,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko_KR">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <AuthWrapper>
+          {children}
+        </AuthWrapper>
+      </body>
     </html>
   );
 }

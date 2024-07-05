@@ -11,7 +11,7 @@ export default async function page() {
 
   return (
     <div>
-      <Header />
+      <Header session={session} />
       
       { session ? session && session.user && session.user.isAdmin === 'true' ? <AdminPage session={session.user} /> : <UserPage session={session.user} /> : <h1>Loading...</h1> }
 
