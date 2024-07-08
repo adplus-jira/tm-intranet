@@ -3,7 +3,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
-import { DataTable } from "./data-table";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from "@/components/ui/textarea";
@@ -16,17 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
-export const AddTargetComponent = ({ handleSubmit }) => {
-  return (
-    <form className="flex flex-row gap-2 w-full m-auto" action={handleSubmit}>
-      <Input type="text" name="naverId" placeholder="네이버ID" />
-      <Input type="text" name="blogId" placeholder="블로그ID" />
-      <Input type="text" name="phone" placeholder="전화번호" />
-      <Button type="submit" className="w-[100px] m-auto">등록하기</Button>
-    </form>
-  )
-}
+import { CustomTable } from "../components/customTable";
+import { DatePicker } from "../components/customDatePicker";
 
 export const AddBlockTargetComponent = ({ handleSubmit }) => {
   const [jsonFile, setJsonFile] = useState([]);
@@ -53,169 +43,93 @@ export const AddBlockTargetComponent = ({ handleSubmit }) => {
   )
 }
 
-export const TargetList = ({ targets, deleteTarget, editTarget }) => {
+export const TargetList = ({ deleteTarget, editTarget, getTargetData }) => {
   const columns = [{
-    header: ({ column }) => {
-      return (
-        <p
-          variant="ghost"
-          className="cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          번호
-          {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-        </p>
-      )
-    },
-    accessorKey: 'idx'
+    id: 'naver_id',
+    label: '네이버ID'
   }, {
-    header: 'targetSeq',
-    accessorKey: 'targetSeq'
+    id: 'blog_id',
+    label: '블로그ID'
   }, {
-    header: '네이버ID',
-    accessorKey: 'naverId'
+    id: 'phone',
+    label: '전화번호'
   }, {
-    header: '블로그ID',
-    accessorKey: 'blogId'
+    id: 'cnt_call',
+    label: '통화횟수'
   }, {
-    header: '전화번호',
-    accessorKey: 'phone'
+    id: 'is_receive_ok',
+    label: '수신희망여부'
   }, {
-    header: ({ column }) => {
-      return (
-        <p
-          variant="ghost"
-          className="cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          전화횟수
-          {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-        </p>
-      )
-    },
-    cell: ({ row }) => {
-      return (
-        <p className="">{row.getValue('cntCall')}</p>
-      )
-    },
-    accessorKey: 'cntCall'
+    id: 'create_date',
+    label: '생성일'
   }, {
-    header: ({ column }) => {
-      return (
-        <p
-          variant="ghost"
-          className="cursor-pointer"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          수신희망여부
-          {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-        </p>
-      )
-    },
-    accessorKey: 'isReceiveOk',
-    cell: ({ row }) => {
-      return (
-        <p className="">{row.getValue('isReceiveOk') === 1 ? '수신' : '거부'}</p>
-      )
-    }
+    id: 'update_date',
+    label: '수정일'
   }, {
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          등록일
-          {/* <ArrowUpDown className="ml-2 h-4 w-4" /> */}
-        </Button>
-      )
-    },
-    accessorKey: 'createdAt',
-    enableSorting: true,
+    id: 'collecte_date',
+    label: '수집일'
   }, {
-    header: '수정일',
-    accessorKey: 'updatedAt'
+    id: 'collect_url',
+    label: '수집URL'
   }, {
-    header: '데이터수집일',
-    accessorKey: 'collectedAt'
+    id: 'memo',
+    label: '메모'
   }, {
-    header: '데이터URL',
-    accessorKey: 'collectUrl'
+    id: 'edit',
+    label: '수정'
   }, {
-    header: '메모',
-    accessorKey: 'memo',
-  }, {
-    header: '수정',
-    accessorKey: 'edit',
-    cell: ({ row }) => {
-      return (
-        <EditModal
-          targetSeq={row.getValue('targetSeq')}
-          naverId={row.getValue('naverId')}
-          blogId={row.getValue('blogId')}
-          phone={row.getValue('phone')}
-          editTarget={editTarget}
-          cntCall={row.getValue('cntCall')}
-          isReceiveOk={row.getValue('isReceiveOk')}
-          collectUrl={row.getValue('collectUrl')}
-
-        />
-      )
-    }
-  }, {
-    header: '삭제',
-    accessorKey: 'delete',
-    cell: ({ row }) => {
-      return (
-        <Button variant="ghost" className="bg-red-500 text-white" onClick={() => deleteTarget(row.getValue('targetSeq'))}>삭제</Button>
-      )
-    }
+    id: 'delete',
+    label: '삭제'
   }];
 
+  const [pagination, setPagination] = useState(0);
+  const [showCount, setShowCount] = useState(10);
+
+  const today = new Date();
+
+  const [date, setDate] = useState({
+    from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
+    to: new Date(),
+  });
+  const [ maxCount, setMaxCount ] = useState(0);
+  const [values, setValues] = useState({});
+  const [targetDatas, setTargetDatas] = useState([]);
+
   // for search value update
-  const handleSearch = async (formData) => {
-    const search = formData.get('search');
-    const response = await fetch('/api/target/' + search, { method: 'GET' }).then(res => res.json()).then(data => data.data);
-    const responseData = response.map((targetData, index) => {
-      return {
-        idx: index + 1,
-        targetSeq: targetData.target_seq,
-        naverId: targetData.naver_id,
-        blogId: targetData.blog_id,
-        phone: targetData.phone,
-        cntCall: targetData.cnt_call,
-        isReceiveOk: targetData.is_receive_ok,
-        createdAt: targetData.create_date?.substring(0, 10),
-        updatedAt: targetData.update_date?.substring(0, 10),
-        collectedAt: targetData.collect_date?.substring(0, 10),
-        collectUrl: targetData.collect_url,
-        memo: targetData.memo,
-        edit: '',
-        delete: ''
-      }
+  const handleSearch = async () => {
+    getTargetData({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
+      setTargetDatas(res.data);
+      setMaxCount(res.count);
+      setPagination(0);
+      setShowCount(10);
     });
-    setTargetDatas(responseData);
   }
-  const [targetDatas, setTargetDatas] = useState(targets);
+  
 
   useEffect(() => {
-    setTargetDatas(targets);
-  }, [targets]);
+    getTargetData({ pagination: pagination, count: showCount }).then(res => {setTargetDatas(res.data); setMaxCount(res.count)});
+  }, [pagination, showCount]);
 
   return (
-    <>
-      <form action={handleSearch}>
-        <div className="flex flex-row max-w-[50%] space-x-2 mb-4">
-          <Input
-            placeholder="검색 내용"
-            className="w-full"
-            name="search"
-          />
-          <Button type="submit" className="w-[100px] m-auto">검색</Button>
-        </div>
-      </form>
-      <DataTable columns={columns} data={targetDatas} />
-    </>
+    <div>
+      <div className="flex flex-row w-full space-x-2 align-center justify-center mb-10">
+        <Input className="w-[200px]" type="text" name="naverId" placeholder="네이버ID" onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
+        <Input className="w-[200px]" type="text" name="blogId" placeholder="블로그ID" onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
+        <Input className="w-[200px]" type="text" name="phone" placeholder="전화번호" onChange={(e) => setValues({ ...values, phone: e.target.value })} />
+        <Select name="isReceiveOk" onValueChange={(v) => setValues({ ...values, isReceiveOk: v })}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="수신여부" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">수신</SelectItem>
+            <SelectItem value="0">거부</SelectItem>
+          </SelectContent>
+        </Select>
+        <DatePicker date={date} setDate={setDate} />
+        <Button className="w-[100px]" onClick={() => handleSearch()}>검색</Button>
+      </div>
+      <CustomTable columns={columns} rowDatas={targetDatas} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
+    </div>
   )
 }
 

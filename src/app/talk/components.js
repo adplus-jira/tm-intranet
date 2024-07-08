@@ -1,34 +1,76 @@
 'use client';
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { DatePicker } from "../components/customDatePicker";
-import React from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { addDays } from "date-fns";
+import { subDays } from "date-fns";
+import { CustomTable } from "../components/customTable";
 
-export const TalkTable = ({ talkLists, userList }) => {
-  const [date, setDate] = React.useState({
-    from: new Date(),
-    to: addDays(new Date(), 7),
+const columns = [{
+  id: 'target_seq',
+  label: '타겟SEQ'
+}, {
+  id: 'call_user_seq',
+  label: '전화한USER'
+}, {
+  id: 'status',
+  label: '상태'
+}, {
+  id: 'talk_user_seq',
+  label: '자료보낸USER'
+}, {
+  id: 'memo',
+  label: '메모'
+}, {
+  id: 'create_date',
+  label: '생성된날짜'
+}, {
+  id: 'update_date',
+  label: '업데이트날짜'
+}];
+
+export const TalkTable = ({ userLists, getTalkDatas }) => {
+  const [date, setDate] = useState({
+    from: subDays(new Date(), 7),
+    to: new Date(),
   });
+  const [pagination, setPagination] = useState(0);
+  const [showCount, setShowCount] = useState(10);
+  const [talkList, setTalkList] = useState([]);
+  const [maxCount, setMaxCount] = useState(0);
+  const [values, setValues] = useState({});
 
-  const [values, setValues] = React.useState({});
-  const [talkList, setTalkList] = React.useState(talkLists);
+  const handleSearch = () => {
+    getTalkDatas({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
+      setTalkList(res.data);
+      setMaxCount(res.count);
+      setPagination(0);
+      setShowCount(10);
+    });
+  }
 
   const onClickReset = () => {
-    setValues({ status: '' });
-    setTalkList(talkLists);
+    setValues({});
+    getTalkDatas({ pagination: 0, count: 10 }).then(res => {setTalkList(res.data); setMaxCount(res.count)});
     setDate({
-      from: new Date(),
-      to: addDays(new Date(), 7),
+      from: subDays(new Date(), 7),
+      to: new Date(),
     })
   }
+  
+  useEffect(() => {
+    getTalkDatas({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => {
+      const resData = res.data.map(data => {
+        const talkUser = userLists.find(user => user.idx === data.talk_user_seq);
+        const callUser = userLists.find(user => user.idx === data.call_user_seq);
+        return { ...data, talk_user_seq: talkUser?.user_name, call_user_seq: callUser?.user_name }
+      });
 
-  const getUserName = (userSeq) => {
-    return userList.find(user => user.idx === userSeq)?.user_name;
-  }
+      setTalkList(resData);
+      setMaxCount(res.count)
+    });
+  }, [pagination, showCount]);
   
   return (
     <div>
@@ -44,40 +86,10 @@ export const TalkTable = ({ talkLists, userList }) => {
           </SelectContent>
         </Select>
         <DatePicker date={date} setDate={setDate} />
-        <Button className="w-[100px]" onClick={() => handleSearch({ ...values, startDate: date.from, endDate: date.to }).then(res => setTalkList(res) )}>검색</Button>
+        <Button className="w-[100px]" onClick={() => handleSearch()}>검색</Button>
         <Button className="w-[100px]" onClick={() => onClickReset()}>초기화</Button>
       </div>
-    
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>#</TableHead>
-          <TableHead>타겟SEQ</TableHead>
-          <TableHead>전화한USER</TableHead>
-          <TableHead>상태</TableHead>
-          <TableHead>자료보낸USER</TableHead>
-          <TableHead>메모</TableHead>
-          <TableHead>생성된날짜</TableHead>
-          <TableHead>업데이트날짜</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {
-          talkList?.map((talk, index) => (
-            <TableRow key={index}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>{talk.target_seq}</TableCell>
-              <TableCell>{getUserName(talk.call_user_seq)}</TableCell>
-              <TableCell>{talk.status}</TableCell>
-              <TableCell>{talk.talk_user_seq}</TableCell>
-              <TableCell>{talk.memo}</TableCell>
-              <TableCell>{talk.create_date?.substring(0, 10)}</TableCell>
-              <TableCell>{talk.update_date?.substring(0, 10)}</TableCell>
-            </TableRow>
-          ))
-        }
-      </TableBody>
-    </Table>
+    <CustomTable columns={columns} rowDatas={talkList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
     </div>
   )
 }

@@ -5,7 +5,6 @@ export async function GET(request, context) {
   const { search } = context.params;
 
   const res = await execQuery(`SELECT * FROM target WHERE naver_id like '%${search}%' or blog_id like '%${search}%' or phone like '%${search}%' or memo like '%${search}%'`) 
-  console.log("!!!!", res);
   return Response.json({ status: 'success', data: res });
 }
 

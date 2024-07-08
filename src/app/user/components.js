@@ -90,10 +90,10 @@ const UserList = async () => {
                   </form>
                 </TableCell>
                 <TableCell>
-                  <form action={onDelete}>
+                  {/* <form action={onDelete}>
                     <input type="hidden" name="idx" value={user.idx} />
                     <Button type="submit" className="w-[100px] bg-red-500 hover:bg-red-400">삭제</Button>
-                  </form>
+                  </form> */}
                 </TableCell>
               </TableRow>
             )

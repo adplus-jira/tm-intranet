@@ -15,6 +15,7 @@ function Header({ session }) {
           { session.user.isAdmin === 'true' && <div onClick={() => router.push('/target')}>타겟관리</div> }
           { session.user.isAdmin === 'true' && <div onClick={() => router.push('/call')}>콜관리</div> }
           { session.user.isAdmin === 'true' && <div onClick={() => router.push('/talk')}>톡관리</div> }
+          { session.user.isAdmin === 'false' && <div onClick={() => router.push('/record')}>기록보기</div> }
           <div onClick={() => signOut({ callbackUrl: '' })}>로그아웃</div>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { revalidateTag } from "next/cache";
 import Header from "../components/Header";
-import { AddBlockTargetComponent, AddTargetComponent, TargetList } from "./components";
+import { AddBlockTargetComponent, TargetList } from "./components";
 import { auth } from "@/auth";
 
 export default async function Page() {
@@ -25,18 +25,11 @@ export default async function Page() {
     }
   });
 
-  // 단건 등록 삭제
-  // const handleTargetSubmit = async (formData) => {
-  //   'use server';
-  //   const rawFormData = {
-  //     naverId: formData.get('naverId'),
-  //     blogId: formData.get('blogId'),
-  //     phone: formData.get('phone')
-  //   }
-
-  //   const response = await fetch(process.env.URL + '/api/target', { method: 'POST', body: JSON.stringify(rawFormData) }).then(res => res.json()).then(data => data.data);
-  //   revalidateTag('target');
-  // }
+  const getTargetData = async (formData) => {
+    'use server';
+    const targetDatas = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify(formData), next: { tags: ["record"] } }).then(res => res.json());
+    return targetDatas;
+  }
 
   const handleBlockTargetSubmit = async (jsonData) => {
     'use server';
@@ -71,12 +64,6 @@ export default async function Page() {
     <div>
       <Header session={session} />
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
-        {/* <div>
-          <h1 className="w-full border-b-1">타겟 단건 등록</h1>
-          <div className="w-2xl mb-10">
-            <AddTargetComponent handleSubmit={handleTargetSubmit} />
-          </div>
-        </div> */}
         <div>
           <h1 className="w-full border-b-1">타겟 등록</h1>
           <div className="w-2xl max-w-lg">
@@ -88,7 +75,7 @@ export default async function Page() {
 
         </div>
         <div className="w-full m-auto">
-          <TargetList targets={targets} deleteTarget={deleteTarget} editTarget={editTarget} />
+          <TargetList deleteTarget={deleteTarget} editTarget={editTarget} getTargetData={getTargetData} />
         </div>
       </div>
     </div>

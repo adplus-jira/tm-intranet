@@ -1,46 +1,78 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "../components/customDatePicker";
 import { Button } from "@/components/ui/button";
-import { addDays } from "date-fns";
+import { subDays } from "date-fns";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { CustomTable } from "../components/customTable";
 
+const columns = [{
+  id: 'user_seq',
+  label: '이름'
+}, {
+  id: 'target_seq',
+  label: '타겟SEQ'
+}, {
+  id: 'naver_id',
+  label: '네이버ID'
+}, {
+  id: 'blog_id',
+  label: '블로그ID'
+}, {
+  id: 'phone',
+  label: '번호'
+}, {
+  id: 'result',
+  label: '처리상태'
+}, 
+{
+  id: 'create_date',
+  label: '만든날짜'
+}, {
+  id: 'update_date',
+  label: '업데이트날짜'
+}];
 
-
-export function CallList({ userList, handleSearch, callLists }) {
+export function CallList({ userList, getCallDatas }) {
   const [date, setDate] = React.useState({
-    from: new Date(),
-    to: addDays(new Date(), 7),
+    from: subDays(new Date(), 7),
+    to: new Date(),
   });
-
+  const [pagination, setPagination] = useState(0);
+  const [showCount, setShowCount] = useState(10);
+  const [callList, setCallList] = useState([]);
+  const [maxCount, setMaxCount] = useState(0);
   const [values, setValues] = useState({});
-  const [callList, setCallList] = useState(callLists);
 
-  const getUserName = (userSeq) => {
-    return userList.find(user => user.idx === userSeq)?.user_name;
-  }
-
-  const onChange = (e) => {
-    const { name, value } = e.target;
-    setValues({ ...values, [name]: value });
+  const handleSearch = () => {
+    getCallDatas({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
+      setCallList(res.data);
+      setMaxCount(res.count);
+      setPagination(0);
+      setShowCount(10);
+    });
   }
 
   const onClickReset = () => {
-    setValues({ user_seq: '', result: '', searchValue: '' });
-    setCallList(callLists);
+    setValues({});
+    getCallDatas({ pagination: 0, count: 10 }).then(res => {setCallList(res.data); setMaxCount(res.count)});
     setDate({
-      from: new Date(),
-      to: addDays(new Date(), 7),
+      from: subDays(new Date(), 7),
+      to: new Date(),
     })
   }
+  
+  useEffect(() => {
+    getCallDatas({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => {setCallList(res.data); setMaxCount(res.count)});
+  }, [pagination, showCount]);
 
   return (
     <div className="">
       <div className="flex flex-row w-full space-x-2 align-center justify-center mb-10">
-        <Select name="user_seq" value={values.user_seq} onValueChange={(v) => setValues({ ...values, user_seq: v })}>
+        <Select name="user_seq" value={values.user_seq} onValueChange={(v) => setValues({ ...values, userSeq: v })}>
           <SelectTrigger className="w-[250px]">
             <SelectValue placeholder="사용자" />
           </SelectTrigger>
@@ -64,40 +96,14 @@ export function CallList({ userList, handleSearch, callLists }) {
           </SelectContent>
         </Select>
         <DatePicker date={date} setDate={setDate} />
-        <Input className="w-[200px]" placeholder="검색어 입력" name="searchValue" onChange={onChange} value={values.searchValue} />
-        <Button className="w-[100px]" onClick={() => handleSearch({ ...values, startDate: date.from, endDate: date.to }).then(res => setCallList(res) )}>검색</Button>
+        <Input className="w-[200px]" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
+        <Input className="w-[200px]" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
+        <Input className="w-[200px]" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
+
+        <Button className="w-[100px]" onClick={() => handleSearch() }>검색</Button>
         <Button className="w-[100px]" onClick={() => onClickReset()}>초기화</Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>#</TableHead>
-            <TableHead>이름</TableHead>
-            <TableHead>타겟SEQ</TableHead>
-            <TableHead>네이버ID</TableHead>
-            <TableHead>블로그Id</TableHead>
-            <TableHead>번호</TableHead>
-            <TableHead>만든날짜</TableHead>
-            <TableHead>업데이트날짜</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {
-            callList.map((call, index) => (
-              <TableRow key={index}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{getUserName(call.user_seq)}</TableCell>
-                <TableCell>{call.target_seq}</TableCell>
-                <TableCell>{call.naver_id}</TableCell>
-                <TableCell>{call.blog_id}</TableCell>
-                <TableCell>{call.phone}</TableCell>
-                <TableCell>{call.create_date?.substring(0, 10)}</TableCell>
-                <TableCell>{call.update_date?.substring(0, 10)}</TableCell>
-              </TableRow>
-            ))
-          }
-        </TableBody>
-      </Table>
+      <CustomTable columns={columns} rowDatas={callList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
     </div>
   )
 }
