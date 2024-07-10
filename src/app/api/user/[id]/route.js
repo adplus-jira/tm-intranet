@@ -1,4 +1,5 @@
 import { execQuery } from '@/app/api/commonApi';
+import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 export async function DELETE (request, context) {
@@ -19,5 +20,6 @@ export async function PATCH (request, context) {
   console.log(request);
   const res = await execQuery(`UPDATE user SET user_id = '${userId}', user_password = '${password}', user_name = '${name}' WHERE idx = '${id}'`);
   console.log(res);
+  revalidateTag('users');
   return NextResponse.json(res);
 }

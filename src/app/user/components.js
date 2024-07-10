@@ -37,8 +37,8 @@ const Modal = ({ idx, userId, userPw, userName }) => {
 
 
 
-const UserList = async () => {
-  const userData = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } }).then(res => res.json()).then(data => data.data);
+const UserList = async ({ userData }) => {
+  
 
   const onDelete = async (formData) => {
     'use server';
@@ -68,12 +68,11 @@ const UserList = async () => {
           <TableHead>삭제일</TableHead>
           <TableHead></TableHead>
           <TableHead></TableHead>
-          <TableHead></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {
-          userData.map((user, index) => {
+          userData && userData.map((user, index) => {
             return (
               <TableRow key={index}>
                 <TableCell>{index + 1}</TableCell>
@@ -88,12 +87,6 @@ const UserList = async () => {
                     <input type="hidden" name="idx" value={user.idx} />
                     <Button type="submit" className="w-[100px] bg-slate-500 hover:bg-slate-400" disabled={user.disable_at ? true : false}>비활성화</Button>
                   </form>
-                </TableCell>
-                <TableCell>
-                  {/* <form action={onDelete}>
-                    <input type="hidden" name="idx" value={user.idx} />
-                    <Button type="submit" className="w-[100px] bg-red-500 hover:bg-red-400">삭제</Button>
-                  </form> */}
                 </TableCell>
               </TableRow>
             )
@@ -112,16 +105,18 @@ const AddUserComponent = () => {
       password: formData.get('password'),
       name: formData.get('name')
     }
-    const response = await fetch(process.env.URL + '/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rawFormData) }).then(res => res.json());
+    await fetch(process.env.URL + '/api/user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rawFormData) });
     revalidateTag('users');
   }
 
   return (
-    <form className="flex flex-row gap-2 w-full m-auto" action={handleSubmit}>
-      <Input type="text" name="id" placeholder="ID" />
-      <Input type="text" name="password" placeholder="Password" />
-      <Input type="text" name="name" placeholder="Name" />
-      <Button type="submit" className="w-[100px] m-auto">등록하기</Button>
+    <form action={handleSubmit}>
+      <div className="flex md:flex-row flex-col gap-2 w-full m-auto">
+        <Input type="text" name="id" placeholder="ID" />
+        <Input type="text" name="password" placeholder="Password" />
+        <Input type="text" name="name" placeholder="Name" />
+        <Button type="submit" className="md:w-[100px] w-full m-auto">등록하기</Button>
+      </div>
     </form>
   )
 }

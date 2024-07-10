@@ -4,6 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectItem, SelectValue, SelectTrigger, SelectContent } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
+import { TrendingUp } from "lucide-react"
+import { Bar, BarChart, CartesianGrid, XAxis, LineChart, Line } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+
+
+
 
 export const CallCard = ({ cardDatas, handleSubmit }) => {
 
@@ -79,5 +95,119 @@ export const CallCard = ({ cardDatas, handleSubmit }) => {
         </div>
       </form>
     </div>
+  )
+}
+
+// const chartData = [
+//   { month: "January", desktop: 186, mobile: 80 },
+//   { month: "February", desktop: 305, mobile: 200 },
+//   { month: "March", desktop: 237, mobile: 120 },
+//   { month: "April", desktop: 73, mobile: 190 },
+//   { month: "May", desktop: 209, mobile: 130 },
+//   { month: "June", desktop: 214, mobile: 140 },
+// ];
+
+// const chartConfig = {
+//   desktop: {
+//     label: "Desktop",
+//     color: "blue",
+//   },
+//   mobile: {
+//     label: "Mobile",
+//     color: "red",
+//   },
+// }
+
+export const DataChart = ({ title, chartData, dataKey, chartConfig, barKeys }) => {
+  return (
+    <>
+      {chartData && chartConfig && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+            {/* <CardDescription></CardDescription> */}
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig} style={{ margin: 'auto' }}>
+              <BarChart accessibilityLayer data={chartData} height={500}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={dataKey}
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={value => value}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dashed" />}
+                />
+                {
+                  barKeys && barKeys.map((key, index) => (
+                    <Bar key={index} dataKey={key} fill={`var(--color-${key})`} radius={4} />
+                  ))
+                }
+                {/* <Bar dataKey={"call_count"} fill={`var(--color-call_count)`} radius={4} />
+            <Bar dataKey={"talk_count"} fill={`var(--color-talk_count)`} radius={4} /> */}
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
+
+    </>
+  )
+}
+
+export function DataLineChart({ chartData, chartConfig, dataKey }) {
+  const _chartConfig = chartConfig.map((config, index) => {
+    return {
+      [config.user_name]: {
+        label: config.user_name,
+        color: `red`,
+      }
+    }
+  })
+
+  const configColors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan', 'magenta', 'brown'];
+
+  return (
+    <>
+      {chartData && chartConfig && (
+        <Card>
+          <CardHeader>
+            <CardTitle>7일간 유저별 통계</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={_chartConfig}>
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                margin={{
+                  left: 12,
+                  right: 12,
+                }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="day"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  tickFormatter={(value) => value.split('T')[0]}
+                />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                {
+                  chartConfig.map((config, index) => (
+                    <Line key={index} dataKey={config.user_name} type="monotone" stroke={configColors[index]} strokeWidth={2} dot={true} />
+                  ))
+                }
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      )}
+    </>
+
   )
 }

@@ -24,7 +24,7 @@ export const CustomTable = ({ columns, rowDatas, pagination, setPagination, setS
             <TableHead>#</TableHead>
             {
               columns.map((column, index) => (
-                <TableHead key={index}>{column.label}</TableHead>
+                <TableHead key={index} className="min-w-[100px]">{column.label}</TableHead>
               ))
             }
           </TableRow>

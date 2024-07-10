@@ -78,7 +78,7 @@ export function CallList({ userList, getCallDatas }) {
           </SelectTrigger>
           <SelectContent>
             {
-              userList.map((user, index) => (
+              userList && userList.map((user, index) => (
                 <SelectItem key={index} value={user.idx}>{user.user_name}({user.user_id})</SelectItem>
               ))
             }

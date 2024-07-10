@@ -17,10 +17,9 @@ export async function authenticate(prevState, formData) {
       name: user.name,
       isAdmin: user.isAdmin,
       redirect: false
-    }
-    ).then(() => {
-      redirect('/dashboard');
-    });
+    })
+    await execQuery(`UPDATE user SET last_login_date = NOW() WHERE idx = ${user.idx}`);
+    redirect('/dashboard');
   }
 }
 

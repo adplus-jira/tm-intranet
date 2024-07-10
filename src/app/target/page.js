@@ -2,38 +2,21 @@ import { revalidateTag } from "next/cache";
 import Header from "../components/Header";
 import { AddBlockTargetComponent, TargetList } from "./components";
 import { auth } from "@/auth";
+import { Suspense } from "react";
 
 export default async function Page() {
   const session = await auth();
-  const targetDatas = await fetch(process.env.URL + '/api/target', { method: 'GET', next: { tags: ["target"] } }).then(res => res.json()).then(data => data.data);
-  const targets = targetDatas.map((targetData, index) => {
-    return {
-      idx: index + 1,
-      targetSeq: targetData.target_seq,
-      naverId: targetData.naver_id,
-      blogId: targetData.blog_id,
-      phone: targetData.phone,
-      cntCall: targetData.cnt_call,
-      isReceiveOk: targetData.is_receive_ok,
-      createdAt: targetData.create_date?.substring(0, 10),
-      updatedAt: targetData.update_date?.substring(0, 10),
-      collectedAt: targetData.collect_date?.substring(0, 10),
-      collectUrl: targetData.collect_url,
-      memo: targetData.memo,
-      edit: '',
-      delete: '',
-    }
-  });
 
   const getTargetData = async (formData) => {
     'use server';
-    const targetDatas = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify(formData), next: { tags: ["record"] } }).then(res => res.json());
+    const response = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify(formData), next: { tags: ["record"] } });
+    const targetDatas = await response.json();
     return targetDatas;
   }
 
   const handleBlockTargetSubmit = async (jsonData) => {
     'use server';
-    const response = await fetch(process.env.URL + '/api/target', { method: 'POST', body: JSON.stringify(jsonData) }).then(res => res.json()).then(data => data.data);
+    await fetch(process.env.URL + '/api/target', { method: 'POST', body: JSON.stringify(jsonData) }).then(res => res.json());
     revalidateTag('target');
   }
 
@@ -60,22 +43,28 @@ export default async function Page() {
     revalidateTag('target');
   }
 
+  const response = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify({ pagination: 0, count: 10 }), next: { tags: ['target'] } });
+  const { data: targetData, count: count } = await response.json();
+
   return (
     <div>
       <Header session={session} />
-      <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
+      <div className="flex flex-col max-w-fit mt-5 w-full m-auto space-y-5">
         <div>
-          <h1 className="w-full border-b-1">타겟 등록</h1>
+          <h1 className="w-full border-b-1 font-bold p-4">타겟 등록</h1>
           <div className="w-2xl max-w-lg">
-            <AddBlockTargetComponent handleSubmit={handleBlockTargetSubmit} />
+            <Suspense fallback={<div>Loading...</div>}>
+              <AddBlockTargetComponent handleSubmit={handleBlockTargetSubmit} />
+            </Suspense>
           </div>
         </div>
         <div>
-          <h1 className="w-full mt-10 mb-2">타겟 목록</h1>
-
+          <h1 className="w-full mt-5 p-4 font-bold">타겟 목록</h1>
         </div>
         <div className="w-full m-auto">
-          <TargetList deleteTarget={deleteTarget} editTarget={editTarget} getTargetData={getTargetData} />
+          <Suspense fallback={<div>Loading...</div>}>
+            <TargetList targetData={targetData} count={count} deleteTarget={deleteTarget} editTarget={editTarget} getTargetData={getTargetData} />
+          </Suspense>
         </div>
       </div>
     </div>

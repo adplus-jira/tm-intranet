@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'auto';
 
 import { Input } from "@/components/ui/input";
 import { getUserData } from "../api/commonApi";

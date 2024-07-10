@@ -4,8 +4,8 @@ import { revalidateTag } from "next/cache";
 
 
 export async function GET() {
-  const res = await execQuery('SELECT * FROM user');
-  return Response.json({ status: 'success', data: res });
+  const res = await execQuery(`SELECT * FROM user WHERE user_access_control='0' ORDER BY idx ASC`);
+  return Response.json(res);
 }
 
 export async function POST(req, res) {

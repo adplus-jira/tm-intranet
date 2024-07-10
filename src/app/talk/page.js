@@ -5,21 +5,22 @@ import { auth } from "@/auth";
 
 export default async function Page() {
 
+  const session = await auth();
+
   const getTalkDatas = async (formData) => {
     'use server';
     const response = await fetch(process.env.URL + '/api/talk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }).then(res => res.json());
     return response;
   }
 
-  const userLists = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } }).then(res => res.json()).then(res => res.data);
+  const userResponse = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
+  const userLists = await userResponse.json();
 
-  const session = await auth();
-  
   return (
     <div>
       <Header session={session} />
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
-        <h1>톡 관리</h1>
+        <h1 className="font-bold p-4">톡 관리</h1>
         <TalkTable getTalkDatas={getTalkDatas} userLists={userLists} />
       </div>
     </div>

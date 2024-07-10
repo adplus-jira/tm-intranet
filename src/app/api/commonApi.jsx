@@ -28,7 +28,7 @@ export const execQuery = async (query) => {
     const results = await new Promise((resolve, reject) => {
       db.query(query, (error, results) => {
         if (error) {
-          reject(error);
+          reject("queryError!!!", error);
         }
         resolve(results);
         // console.log('execQuery results', results);

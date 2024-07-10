@@ -73,10 +73,10 @@ export const TalkTable = ({ userLists, getTalkDatas }) => {
   }, [pagination, showCount]);
   
   return (
-    <div>
-      <div className="flex flex-row w-full space-x-2 align-center justify-center mb-10">
+    <div className="p-4">
+      <div className="flex md:flex-row flex-col w-full md:space-x-2 align-center justify-center mb-10">
         <Select name="status" value={values.status} onValueChange={(v) => setValues({ ...values, status: v })}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="md:w-[200px] w-full mb-2">
             <SelectValue placeholder="처리상태" />
           </SelectTrigger>
           <SelectContent>
@@ -85,9 +85,9 @@ export const TalkTable = ({ userLists, getTalkDatas }) => {
             <SelectItem value="전달완료">전달완료</SelectItem>
           </SelectContent>
         </Select>
-        <DatePicker date={date} setDate={setDate} />
-        <Button className="w-[100px]" onClick={() => handleSearch()}>검색</Button>
-        <Button className="w-[100px]" onClick={() => onClickReset()}>초기화</Button>
+        <DatePicker date={date} setDate={setDate} className={"mb-2"} />
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => handleSearch()}>검색</Button>
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
       </div>
     <CustomTable columns={columns} rowDatas={talkList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
     </div>
