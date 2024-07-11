@@ -79,7 +79,7 @@ const UserList = async ({ userData }) => {
                 <TableCell>{user.user_id}</TableCell>
                 <TableCell>{user.user_name}</TableCell>
                 <TableCell>{user.create_date.substring(0, 10)}</TableCell>
-                <TableCell>{user.last_login_date}</TableCell>
+                <TableCell>{user.last_login_date?.substring(0,10)}</TableCell>
                 <TableCell>{user.disable_at}</TableCell>
                 <TableCell><Modal idx={user.idx} userId={user.user_id} userPw={user.user_password} userName={user.user_name} /></TableCell>
                 <TableCell>

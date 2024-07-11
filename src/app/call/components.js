@@ -70,10 +70,10 @@ export function CallList({ userList, getCallDatas }) {
   }, [pagination, showCount]);
 
   return (
-    <div className="">
-      <div className="flex flex-row w-full space-x-2 align-center justify-center mb-10">
+    <div className="p-4">
+      <div className="flex md:flex-row flex-col w-full md:space-x-2 align-center justify-center mb-10">
         <Select name="user_seq" value={values.user_seq} onValueChange={(v) => setValues({ ...values, userSeq: v })}>
-          <SelectTrigger className="w-[250px]">
+          <SelectTrigger className="md:w-[250px] w-full mb-2">
             <SelectValue placeholder="사용자" />
           </SelectTrigger>
           <SelectContent>
@@ -85,7 +85,7 @@ export function CallList({ userList, getCallDatas }) {
           </SelectContent>
         </Select>
         <Select name="result" value={values.result} onValueChange={(v) => setValues({ ...values, result: v })}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="md:w-[200px] w-full mb-2">
             <SelectValue placeholder="처리상태" />
           </SelectTrigger>
           <SelectContent>
@@ -95,13 +95,13 @@ export function CallList({ userList, getCallDatas }) {
             <SelectItem value="수신거부">수신거부</SelectItem>
           </SelectContent>
         </Select>
-        <DatePicker date={date} setDate={setDate} />
-        <Input className="w-[200px]" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
-        <Input className="w-[200px]" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
-        <Input className="w-[200px]" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
+        <DatePicker date={date} setDate={setDate} className={"mb-2"} />
+        <Input className="md:w-[200px] w-full mb-2" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
+        <Input className="md:w-[200px] w-full mb-2" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
+        <Input className="md:w-[200px] w-full mb-2" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
 
-        <Button className="w-[100px]" onClick={() => handleSearch() }>검색</Button>
-        <Button className="w-[100px]" onClick={() => onClickReset()}>초기화</Button>
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => handleSearch() }>검색</Button>
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
       </div>
       <CustomTable columns={columns} rowDatas={callList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
     </div>

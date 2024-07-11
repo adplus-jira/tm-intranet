@@ -73,12 +73,6 @@ export const TargetList = ({ deleteTarget, editTarget, getTargetData }) => {
   }, {
     id: 'memo',
     label: '메모'
-  }, {
-    id: 'edit',
-    label: '수정'
-  }, {
-    id: 'delete',
-    label: '삭제'
   }];
 
   const [pagination, setPagination] = useState(0);

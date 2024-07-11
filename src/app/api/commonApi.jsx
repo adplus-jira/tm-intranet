@@ -1,27 +1,8 @@
 'use server';
-
-import db from '../config/db';
 import { NextResponse } from "next/server";
 import { auth } from '@/auth';
 
-export async function getUserData() {
-  try {
-    const results = await new Promise((resolve, reject) => {
-      db.query('SELECT * FROM user', (error, results) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(results);
-        console.log('getUserData results', results);
-      });
-    });
-    return results;
-
-  } catch (error) {
-    console.error('getUserData error', error);
-    return NextResponse.error(error);
-  }
-}
+const db = require('../config/db');
 
 export const execQuery = async (query) => {
   try {
@@ -34,6 +15,7 @@ export const execQuery = async (query) => {
         // console.log('execQuery results', results);
       });
     });
+    
     return JSON.parse(JSON.stringify(results));
 
   } catch (error) {

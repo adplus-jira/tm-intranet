@@ -1,11 +1,8 @@
 import { revalidateTag } from "next/cache";
-import Header from "../components/Header";
 import { AddBlockTargetComponent, TargetList } from "./components";
-import { auth } from "@/auth";
 import { Suspense } from "react";
 
 export default async function Page() {
-  const session = await auth();
 
   const getTargetData = async (formData) => {
     'use server';
@@ -48,7 +45,6 @@ export default async function Page() {
 
   return (
     <div>
-      <Header session={session} />
       <div className="flex flex-col max-w-fit mt-5 w-full m-auto space-y-5">
         <div>
           <h1 className="w-full border-b-1 font-bold p-4">타겟 등록</h1>

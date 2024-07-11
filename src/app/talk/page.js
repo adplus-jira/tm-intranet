@@ -1,11 +1,7 @@
-import Header from "../components/Header";
 import { TalkTable } from "./components";
-import { auth } from "@/auth";
 
 
 export default async function Page() {
-
-  const session = await auth();
 
   const getTalkDatas = async (formData) => {
     'use server';
@@ -18,7 +14,6 @@ export default async function Page() {
 
   return (
     <div>
-      <Header session={session} />
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
         <h1 className="font-bold p-4">톡 관리</h1>
         <TalkTable getTalkDatas={getTalkDatas} userLists={userLists} />

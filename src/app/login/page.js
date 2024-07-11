@@ -2,7 +2,6 @@
 export const dynamic = 'auto';
 
 import { Input } from "@/components/ui/input";
-import { getUserData } from "../api/commonApi";
 import { Button } from "@/components/ui/button";
 
 import { authenticate, test } from "./actions";

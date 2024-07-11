@@ -9,23 +9,23 @@ import { DatePicker } from "../components/customDatePicker";
 export const SearchBar = ({ values, setValues, date, setDate, onSearchClick, onClickReset }) => {
 
   return (
-    <div className="flex flex-row w-full space-x-2 align-center justify-center mb-10">
-        <Select name="result" value={values.result ? values.result : ''} onValueChange={(v) => setValues({ ...values, result: v })}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue placeholder="처리상태" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="대기">대기</SelectItem>
-            <SelectItem value="자료요청">자료요청</SelectItem>
-            <SelectItem value="부재중">부재중</SelectItem>
-            <SelectItem value="수신거부">수신거부</SelectItem>
-          </SelectContent>
-        </Select>
-        <DatePicker date={date} setDate={setDate} />
-        <Input className="w-[200px]" placeholder="검색어 입력" name="searchValue" onChange={(e) => setValues({ ...values, searchValue: e.target.value })} />
-        <Button className="w-[100px]" onClick={() => onSearchClick()}>검색</Button>
-        <Button className="w-[100px]" onClick={() => onClickReset()}>초기화</Button>
-      </div>
+    <div className="flex md:flex-row flex-col w-full md:space-x-2 align-center justify-center mb-10 p-4">
+      <Select name="result" value={values.result ? values.result : ''} onValueChange={(v) => setValues({ ...values, result: v })}>
+        <SelectTrigger className="md:w-[200px] w-full mb-2">
+          <SelectValue placeholder="처리상태" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="대기">대기</SelectItem>
+          <SelectItem value="자료요청">자료요청</SelectItem>
+          <SelectItem value="부재중">부재중</SelectItem>
+          <SelectItem value="수신거부">수신거부</SelectItem>
+        </SelectContent>
+      </Select>
+      <DatePicker date={date} setDate={setDate} className={"mb-2"} />
+      <Input className="md:w-[200px] w-full mb-2" placeholder="검색어 입력" name="searchValue" onChange={(e) => setValues({ ...values, searchValue: e.target.value })} />
+      <Button className="md:w-[100px]  w-full mb-2" onClick={() => onSearchClick()}>검색</Button>
+      <Button className="md:w-[100px]  w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
+    </div>
   )
 }
 
@@ -39,11 +39,11 @@ export const RecordTable = ({ getRecordData }) => {
     from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
     to: new Date(),
   });
-  const [ maxCount, setMaxCount ] = useState(0);
+  const [maxCount, setMaxCount] = useState(0);
   const [values, setValues] = useState({});
 
   useEffect(() => {
-    getRecordData({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => {setRecordDatas(res.data); setMaxCount(res.count)});
+    getRecordData({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => { setRecordDatas(res.data); setMaxCount(res.count) });
   }, [pagination, showCount]);
 
   const onSearchClick = () => {
@@ -56,7 +56,7 @@ export const RecordTable = ({ getRecordData }) => {
   }
 
   const onClickReset = () => {
-    setValues({ });
+    setValues({});
     setDate({
       from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
       to: new Date(),
@@ -88,11 +88,13 @@ export const RecordTable = ({ getRecordData }) => {
     id: 'memo',
     label: '메모'
   }];
-  
+
   return (
     <div>
       <SearchBar setDate={setDate} date={date} values={values} setValues={setValues} onSearchClick={onSearchClick} onClickReset={onClickReset} />
-      <CustomTable columns={columns} rowDatas={recordDatas} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
+      <div className="p-4">
+        <CustomTable columns={columns} rowDatas={recordDatas} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount / showCount)} />
+      </div>
     </div>
   )
 }

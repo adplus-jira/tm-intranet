@@ -43,14 +43,14 @@ export const CallCard = ({ cardDatas, handleSubmit }) => {
   }, [selected])
 
   return (
-    <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-[500px] p-8 m-auto mt-10">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm md:w-[500px] w-full p-8 m-auto mt-10">
       <form action={handleSubmit}>
         <div className="grid grid-cols-4 gap-2">
           <p className="text-sm m-auto">네이버 ID</p>
           <p className="col-span-3">{cardData.naver_id}</p>
           <p className="text-sm m-auto">블로그 ID</p>
           <p className="col-span-3">{cardData.blog_id}</p>
-          <p className="text-sm m-auto">전화한 횟수</p>
+          <p className="text-sm m-auto">전화 횟수</p>
           <p className="col-span-3">{cardData.cnt_call}</p>
           <p className="text-sm m-auto">연락처</p>
           <p className="col-span-3">{cardData.phone}</p>

@@ -7,6 +7,7 @@ export async function GET(request, context) {
 }
 
 export async function POST(request, context) {
+  
   const { idx } = context.params;
   const body = await request.json();
   const { pagination, count } = body;
