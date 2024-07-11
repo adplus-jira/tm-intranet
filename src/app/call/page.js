@@ -3,15 +3,18 @@ import { CallList } from "./components";
 
 export default async function Page() {
   
-  const userList = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } }).then(res => res.json()).then(res => res.data);
-    console.log(userList, "userList")
-  const callList = await fetch(process.env.URL + '/api/call', { method: 'GET', next: { tags: ['call'] } }).then(res => res.json());
+  const userResponse = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
+  const userList = await userResponse.json();
+
+  const callResposne = await fetch(process.env.URL + '/api/call', { method: 'GET', next: { tags: ['call'] } });
+  const callList = await callResposne.json();
+  
   const getCallDatas = async (formData) => {
     'use server';
     const response = await fetch(process.env.URL + '/api/call', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }).then(res => res.json());
     return response;
   }
-  // revalidateTag('users');
+
   return (
     <div>
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">

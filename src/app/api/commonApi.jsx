@@ -12,7 +12,6 @@ export const execQuery = async (query) => {
           reject("queryError!!!", error);
         }
         resolve(results);
-        // console.log('execQuery results', results);
       });
     });
     

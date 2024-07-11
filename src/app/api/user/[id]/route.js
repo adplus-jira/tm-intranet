@@ -17,9 +17,8 @@ export async function PUT (request, context) {
 export async function PATCH (request, context) {
   const { id } = context.params;
   const { userId, password, name } = await request.json();
-  console.log(request);
   const res = await execQuery(`UPDATE user SET user_id = '${userId}', user_password = '${password}', user_name = '${name}' WHERE idx = '${id}'`);
-  console.log(res);
+  
   revalidateTag('users');
   return NextResponse.json(res);
 }

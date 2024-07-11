@@ -15,6 +15,7 @@ const Page = () => {
   
   return (
     <>
+    <h1 className="text-3xl text-center mt-10">LOGIN</h1>
     <div className="w-full max-w-96 m-auto pt-20">
       <form action={handleSubmit} className="grid gap-1.5">
         <Input type="text" name="id" placeholder="ID" />

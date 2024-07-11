@@ -7,8 +7,10 @@ import { execQuery } from '../api/commonApi';
 export async function authenticate(prevState, formData) {
   const sql = 'SELECT * FROM user WHERE user_id = "' + formData.get('id') +'" AND user_password = "' + formData.get('password') + '" LIMIT 1';
   const loginRes = await execQuery(sql);
-  if (loginRes.length === 0) {
-    // throw new Error(JSON.stringify({ message: 'Invalid credentials', error: true }));
+  if ( !formData.get('id') || !formData.get('password') ) {
+    return '아이디와 비밀번호를 입력해주세요.';
+  } else if (loginRes.length === 0) {
+    return '아이디 또는 비밀번호가 틀렸습니다.';
   } else {
     const user = { idx: loginRes[0].idx, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
     await signIn('credentials', {
@@ -21,9 +23,4 @@ export async function authenticate(prevState, formData) {
     await execQuery(`UPDATE user SET last_login_date = NOW() WHERE idx = ${user.idx}`);
     redirect('/dashboard');
   }
-}
-
-export async function test() {
-  const session = await auth();
-  return session;
 }

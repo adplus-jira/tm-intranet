@@ -1,9 +1,10 @@
 import { execQuery } from "../commonApi";
 
-export async function GET () {
-  console.log("hihi");
+export async function GET (req, context) {
+  const searchParams = new URLSearchParams(req);
+  console.log(searchParams);
   const result = await execQuery(`SELECT * FROM talk_result`);
-  console.log(result, "result");  
+   
   return Response.json(result);
 }
 

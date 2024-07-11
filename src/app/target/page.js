@@ -36,12 +36,12 @@ export default async function Page() {
       memo: formData.get('memo')
     }
 
-    const response = await fetch(process.env.URL + '/api/target/' + targetSeq, { method: 'PUT', body: JSON.stringify(rawFormData) }).then(res => res.json()).then(data => data.data);
+    await fetch(process.env.URL + '/api/target/' + targetSeq, { method: 'PUT', body: JSON.stringify(rawFormData) }).then(res => res.json()).then(data => data.data);
     revalidateTag('target');
   }
 
-  const response = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify({ pagination: 0, count: 10 }), next: { tags: ['target'] } });
-  const { data: targetData, count: count } = await response.json();
+  // const response = await fetch(process.env.URL + '/api/target/lists', { method: 'POST', body: JSON.stringify({ pagination: 0, count: 10 }), next: { tags: ['target'] } });
+  // const { data: targetData, count: count } = await response.json();
 
   return (
     <div>
@@ -59,7 +59,7 @@ export default async function Page() {
         </div>
         <div className="w-full m-auto">
           <Suspense fallback={<div>Loading...</div>}>
-            <TargetList targetData={targetData} count={count} deleteTarget={deleteTarget} editTarget={editTarget} getTargetData={getTargetData} />
+            <TargetList deleteTarget={deleteTarget} editTarget={editTarget} getTargetData={getTargetData} />
           </Suspense>
         </div>
       </div>

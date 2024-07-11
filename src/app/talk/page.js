@@ -12,6 +12,8 @@ export default async function Page() {
   const userResponse = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
   const userLists = await userResponse.json();
 
+  const talkResponse = await fetch(process.env.URL + '/api/talk?searchValue=aaa', { method: 'GET', next: { tags: ['talk'] } });
+  
   return (
     <div>
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">

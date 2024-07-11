@@ -1,11 +1,10 @@
 import React, { Suspense } from "react";
 import { AddUserComponent, UserList } from "./components";
 
-export async function Page() {
-
-  const userData = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
-  const userList = await userData.json();
+export async function Page({ searchParams }) {
   
+  const userData = await fetch(process.env.URL + '/api/user?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ["users"] } });
+  const userList = await userData.json();
   return (
     <div>
       <div className="flex flex-col max-w-7xl w-full m-auto">

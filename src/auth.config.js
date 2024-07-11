@@ -1,6 +1,4 @@
-import { NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
-import CredentialsProvider from "next-auth/providers/credentials";
 
 export const authConfig = {
   pages: {
@@ -11,6 +9,7 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user.name;
       const isOnProtected = !(nextUrl.pathname.startsWith('/login'));
 
+      if(nextUrl.pathname === '/') { return NextResponse.redirect(new URL('/dashboard', nextUrl));} 
       if (isOnProtected) {
         if (isLoggedIn) return true;
         return false;

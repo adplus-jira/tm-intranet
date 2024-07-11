@@ -19,7 +19,6 @@ export async function POST(req, response) {
   if( sql.length > 1) {
     let query = sql.replace('AND ', '');
     query = "WHERE " + query;
-    console.log(query)
     res = await execQuery(`SELECT * FROM target ${query} LIMIT ${count} OFFSET ${pagination * count}`);
     res_count = await execQuery(`SELECT COUNT(*) as 'count' FROM target ${query}`);
   }

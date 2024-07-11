@@ -27,18 +27,13 @@ export async function POST (req, res) {
     query = "WHERE " + query;
     const r = await execQuery(`SELECT T.*,C.* FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq ${query} LIMIT ${count} OFFSET ${pagination * count}`);
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq ${query}`);
-    console.log(r, r_count[0].count);
+    
     return Response.json({ data: r, count: r_count[0].count });
   } else {
     const r = await execQuery(`SELECT T.*,C.* FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq LIMIT ${count} OFFSET ${pagination * count}`);
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq`);
+
     return Response.json({ data: r, count: r_count[0].count });
   }
   
-  // const r = await execQuery(`SELECT * FROM call_result C LEFT OUTER JOIN target T ON T.target_seq = C.target_seq WHERE
-  //   ${ user_seq ? ' C.user_seq = "' + user_seq + '" AND ' : ''} ${ result ? 'C.result = "' + result + '" AND ' : ''}
-  //   ${ startDate ? ' C.update_date >= "' + startDate + '" AND ' : ''} ${ endDate ? 'C.update_date <= "' + endDate + '"' : ''} 
-  //   ${ searchValue ? ' AND (T.blog_id LIKE "%' + searchValue + '%" OR T.naver_id LIKE "%' + searchValue + '%" OR T.phone LIKE "%' + searchValue + '%")' : ''} LIMIT 10`);
-  
-  return Response.json(r);
 }

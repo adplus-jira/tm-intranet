@@ -4,7 +4,8 @@ import { DataChart, DataLineChart } from "./components";
 
 
 export async function AdminPage() {
-  const userChartData = await fetch(process.env.URL + '/api/dashboard/admin', { method: 'GET', next: { tags: ["call", "user", "talk" ]} }).then(res => res.json());
+  const userResponse = await fetch(process.env.URL + '/api/dashboard/admin', { method: 'GET', next: { tags: ["call", "user", "talk" ]} });
+  const userChartData = await userResponse.json();
 
   const chartConfig = {
     call_count: {
@@ -18,7 +19,8 @@ export async function AdminPage() {
   }
   const barKeys = ['call_count', 'talk_count'];
 
-  const lineChartData = await fetch(process.env.URL + '/api/dashboard/admin', { method: 'POST', body: JSON.stringify({ startDate: subDays(new Date(), 7), endDate: new Date() }) }).then(res => res.json());
+  const lineChartResponse = await fetch(process.env.URL + '/api/dashboard/admin', { method: 'POST', body: JSON.stringify({ startDate: subDays(new Date(), 7), endDate: new Date() }) });
+  const lineChartData = await lineChartResponse.json();
   
   return (
     <div className="max-w-7xl m-auto grid lg:grid-cols-2 sm:grid-cols-1 gap-2 p-4 mt-10">

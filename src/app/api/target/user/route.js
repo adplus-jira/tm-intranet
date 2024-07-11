@@ -6,7 +6,6 @@ export async function POST(req, res) {
   
   // 사용자가 원래 하고 있던 항목
   if( proceeding.length ) {
-    console.log(proceeding[0], "proceeding");
     return Response.json(proceeding);
   } else {
     // // 새로운 데이터 load
@@ -15,7 +14,7 @@ export async function POST(req, res) {
        WHERE T.is_receive_ok='1' AND (C.result != '대기' OR C.result IS NULL) ORDER BY T.cnt_call ASC LIMIT 1`);
       
     const result = await execQuery(`SELECT * FROM call_result C LEFT OUTER JOIN target T ON T.target_seq = C.target_seq WHERE C.user_seq = '${idx}' ORDER BY C.call_result_seq DESC LIMIT 1`)
-    console.log(result, "new data");
+    
     return Response.json(result);
   }
 }
