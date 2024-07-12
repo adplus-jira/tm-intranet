@@ -1,10 +1,14 @@
 'use client';
-import { CustomTable } from "../components/customTable";
+
+import { CustomTable } from "../components/custom-table";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "../components/customDatePicker";
+import { subDays } from "date-fns";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import { useCallback } from "react";
 
 export const SearchBar = ({ values, setValues, date, setDate, onSearchClick, onClickReset }) => {
 
@@ -22,51 +26,57 @@ export const SearchBar = ({ values, setValues, date, setDate, onSearchClick, onC
         </SelectContent>
       </Select>
       <DatePicker date={date} setDate={setDate} className={"mb-2"} />
-      <Input className="md:w-[200px] w-full mb-2" placeholder="검색어 입력" name="searchValue" onChange={(e) => setValues({ ...values, searchValue: e.target.value })} />
-      <Button className="md:w-[100px]  w-full mb-2" onClick={() => onSearchClick()}>검색</Button>
-      <Button className="md:w-[100px]  w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
+      <Input className="md:w-[170px] w-full mb-2" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
+        <Input className="md:w-[170px] w-full mb-2" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
+        <Input className="md:w-[170px] w-full mb-2" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
+
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => onSearchClick() }>검색</Button>
+        <Button className="md:w-[100px] w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
     </div>
   )
 }
 
-export const RecordTable = ({ getRecordData }) => {
+export const RecordTable = ({ recordDatas, count }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [pagination, setPagination] = useState(0);
-  const [recordDatas, setRecordDatas] = useState([]);
-  const [showCount, setShowCount] = useState(10);
-  const today = new Date();
+  const createQueryString = useCallback((name, value) => {
+    const params = new URLSearchParams();
+    params.set(name, value);
+    return params;
+  }, [searchParams]);
+
   const [date, setDate] = useState({
-    from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
+    from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const [maxCount, setMaxCount] = useState(0);
+  
   const [values, setValues] = useState({});
 
-  useEffect(() => {
-    getRecordData({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => { setRecordDatas(res.data); setMaxCount(res.count) });
-  }, [pagination, showCount]);
-
   const onSearchClick = () => {
-    getRecordData({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
-      setRecordDatas(res.data);
-      setMaxCount(res.count);
-      setPagination(0);
-      setShowCount(10);
-    });
+    let query = '';
+    if (values.result) query += createQueryString('result', values.result) + '&';
+    if (date.from) query += createQueryString('startDate', date.from.toISOString()) + '&';
+    if (date.to) query += createQueryString('endDate', date.to.toISOString()) + '&';
+    if (values.naverId) query += createQueryString('naverId', values.naverId) + '&';
+    if (values.blogId) query += createQueryString('blogId', values.blogId) + '&';
+    if (values.phone) query += createQueryString('phone', values.phone) + '&';
+
+    if (query.endsWith('&')) {
+      query = query.slice(0, -1);
+    }
+
+    router.push(pathname + '?' + query);
   }
 
   const onClickReset = () => {
     setValues({});
     setDate({
-      from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
+      from: subDays(new Date(), 7),
       to: new Date(),
     });
-    getRecordData({ pagination: 0, count: 10, startDate: date.from, endDate: date.to }).then(res => {
-      setRecordDatas(res.data);
-      setMaxCount(res.count);
-      setPagination(0);
-      setShowCount(10);
-    });
+    router.push(pathname);
   }
 
   const columns = [{
@@ -93,7 +103,7 @@ export const RecordTable = ({ getRecordData }) => {
     <div>
       <SearchBar setDate={setDate} date={date} values={values} setValues={setValues} onSearchClick={onSearchClick} onClickReset={onClickReset} />
       <div className="p-4">
-        <CustomTable columns={columns} rowDatas={recordDatas} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount / showCount)} />
+        <CustomTable columns={columns} rowDatas={recordDatas} count={count} />
       </div>
     </div>
   )

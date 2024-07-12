@@ -6,11 +6,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DatePicker } from "../components/customDatePicker";
 import { Button } from "@/components/ui/button";
 import { subDays } from "date-fns";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { CustomTable } from "../components/customTable";
+import { CustomTable } from "../components/custom-table";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 const columns = [{
-  id: 'user_seq',
+  id: 'user_name',
   label: '이름'
 }, {
   id: 'target_seq',
@@ -36,44 +37,54 @@ const columns = [{
   label: '업데이트날짜'
 }];
 
-export function CallList({ userList, getCallDatas }) {
+export function CallList({ callLists, count, userList }) {
   const [date, setDate] = React.useState({
     from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const [pagination, setPagination] = useState(0);
-  const [showCount, setShowCount] = useState(10);
-  const [callList, setCallList] = useState([]);
-  const [maxCount, setMaxCount] = useState(0);
+
   const [values, setValues] = useState({});
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback((name, value) => {
+    const params = new URLSearchParams();
+    params.set(name, value);
+    return params;
+  }, [searchParams]);
 
   const handleSearch = () => {
-    getCallDatas({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
-      setCallList(res.data);
-      setMaxCount(res.count);
-      setPagination(0);
-      setShowCount(10);
-    });
+    let query = '';
+    if (values.result) query += createQueryString('result', values.result) + '&';
+    if (values.userSeq) query += createQueryString('userSeq', values.userSeq) + '&';
+    if (date.from) query += createQueryString('startDate', date.from.toISOString()) + '&';
+    if (date.to) query += createQueryString('endDate', date.to.toISOString()) + '&';
+    if (values.naverId) query += createQueryString('naverId', values.naverId) + '&';
+    if (values.blogId) query += createQueryString('blogId', values.blogId) + '&';
+    if (values.phone) query += createQueryString('phone', values.phone) + '&';
+
+    if (query.endsWith('&')) {
+      query = query.slice(0, -1);
+    }
+
+    router.push(pathname + '?' + query);
   }
 
   const onClickReset = () => {
     setValues({});
-    getCallDatas({ pagination: 0, count: 10 }).then(res => {setCallList(res.data); setMaxCount(res.count)});
     setDate({
       from: subDays(new Date(), 7),
       to: new Date(),
-    })
+    });
+    router.push('/call');
   }
-  
-  useEffect(() => {
-    getCallDatas({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => {setCallList(res.data); setMaxCount(res.count)});
-  }, [pagination, showCount]);
 
   return (
     <div className="p-4">
       <div className="flex md:flex-row flex-col w-full md:space-x-2 align-center justify-center mb-10">
         <Select name="user_seq" value={values.user_seq} onValueChange={(v) => setValues({ ...values, userSeq: v })}>
-          <SelectTrigger className="md:w-[250px] w-full mb-2">
+          <SelectTrigger className="md:w-[250px] w-full min-w-[100px] mb-2">
             <SelectValue placeholder="사용자" />
           </SelectTrigger>
           <SelectContent>
@@ -84,8 +95,8 @@ export function CallList({ userList, getCallDatas }) {
             }
           </SelectContent>
         </Select>
-        <Select name="result" value={values.result} onValueChange={(v) => setValues({ ...values, result: v })}>
-          <SelectTrigger className="md:w-[200px] w-full mb-2">
+        <Select name="result" className="md:w-[200px] w-full mb-2" value={values.result} onValueChange={(v) => setValues({ ...values, result: v })}>
+          <SelectTrigger>
             <SelectValue placeholder="처리상태" />
           </SelectTrigger>
           <SelectContent>
@@ -96,14 +107,14 @@ export function CallList({ userList, getCallDatas }) {
           </SelectContent>
         </Select>
         <DatePicker date={date} setDate={setDate} className={"mb-2"} />
-        <Input className="md:w-[200px] w-full mb-2" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
-        <Input className="md:w-[200px] w-full mb-2" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
-        <Input className="md:w-[200px] w-full mb-2" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
+        <Input className="md:w-[170px] w-full mb-2" placeholder="네이버ID" value={values.naverId} onChange={(e) => setValues({ ...values, naverId: e.target.value })} />
+        <Input className="md:w-[170px] w-full mb-2" placeholder="블로그ID" value={values.blogId} onChange={(e) => setValues({ ...values, blogId: e.target.value })} />
+        <Input className="md:w-[170px] w-full mb-2" placeholder="전화번호" value={values.phone} onChange={(e) => setValues({ ...values, phone: e.target.value })} />
 
         <Button className="md:w-[100px] w-full mb-2" onClick={() => handleSearch() }>검색</Button>
         <Button className="md:w-[100px] w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
       </div>
-      <CustomTable columns={columns} rowDatas={callList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
+      <CustomTable columns={columns} rowDatas={callLists} count={count} />
     </div>
   )
 }

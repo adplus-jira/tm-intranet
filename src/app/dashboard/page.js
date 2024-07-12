@@ -12,11 +12,6 @@ export default async function page(props) {
   return (
     <div>
       { session ? session && session.user && session.user.isAdmin === 'true' ? <AdminPage session={session.user} /> : <UserPage session={session.user} /> : <h1>Loading...</h1> }
-
-
-      {/* <form action={handleLogout}>
-        <Button className="w-full">Sign Out</Button>
-      </form> */}
     </div>
   );
 }

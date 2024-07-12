@@ -118,7 +118,7 @@ const AddUserComponent = () => {
         <Input type="text" name="name" placeholder="Name" />
         <Button type="submit" className="md:w-[100px] w-full m-auto">등록하기</Button>
       </div>
-      <Link href={{ pathname: '/user', query: { name: 'user' }}}><Button type="button" className="md:w-[100px] w-full m-auto">조회하기</Button></Link>
+      {/* <Link href={{ pathname: '/user', query: { name: 'user' }}}><Button type="button" className="md:w-[100px] w-full m-auto">조회하기</Button></Link> */}
     </form>
   )
 }

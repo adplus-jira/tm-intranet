@@ -9,13 +9,48 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CustomTable } from "../components/customTable";
+import { CustomTable } from "../components/custom-table";
 import { DatePicker } from "../components/customDatePicker";
+import { subDays } from "date-fns";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
+
+const columns = [{
+  id: 'naver_id',
+  label: '네이버ID'
+}, {
+  id: 'blog_id',
+  label: '블로그ID'
+}, {
+  id: 'phone',
+  label: '전화번호'
+}, {
+  id: 'cnt_call',
+  label: '통화횟수'
+}, {
+  id: 'is_receive_ok',
+  label: '수신희망여부'
+}, {
+  id: 'create_date',
+  label: '생성일'
+}, {
+  id: 'update_date',
+  label: '수정일'
+}, {
+  id: 'collecte_date',
+  label: '수집일'
+}, {
+  id: 'collect_url',
+  label: '수집URL'
+}, {
+  id: 'memo',
+  label: '메모'
+}];
+
 
 export const AddBlockTargetComponent = ({ handleSubmit }) => {
   const [jsonFile, setJsonFile] = useState([]);
@@ -42,66 +77,39 @@ export const AddBlockTargetComponent = ({ handleSubmit }) => {
   )
 }
 
-export const TargetList = ({ deleteTarget, editTarget, getTargetData }) => {
-  const columns = [{
-    id: 'naver_id',
-    label: '네이버ID'
-  }, {
-    id: 'blog_id',
-    label: '블로그ID'
-  }, {
-    id: 'phone',
-    label: '전화번호'
-  }, {
-    id: 'cnt_call',
-    label: '통화횟수'
-  }, {
-    id: 'is_receive_ok',
-    label: '수신희망여부'
-  }, {
-    id: 'create_date',
-    label: '생성일'
-  }, {
-    id: 'update_date',
-    label: '수정일'
-  }, {
-    id: 'collecte_date',
-    label: '수집일'
-  }, {
-    id: 'collect_url',
-    label: '수집URL'
-  }, {
-    id: 'memo',
-    label: '메모'
-  }];
-
-  const [pagination, setPagination] = useState(0);
-  const [showCount, setShowCount] = useState(10);
-
-  const today = new Date();
-
+export const TargetList = ({ targetDatas, count }) => {
   const [date, setDate] = useState({
-    from: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7),
+    from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const [ maxCount, setMaxCount ] = useState(0);
+
   const [values, setValues] = useState({});
-  const [targetDatas, setTargetDatas] = useState([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback((name, value) => {
+    const params = new URLSearchParams();
+    params.set(name, value);
+    return params;
+  }, [searchParams]);
 
   // for search value update
   const handleSearch = async () => {
-    getTargetData({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
-      setTargetDatas(res.data);
-      setMaxCount(res.count);
-      setPagination(0);
-      setShowCount(10);
-    });
-  }
-  
+    let query = '';
+    if (values.naverId) query += createQueryString('naverId', values.naverId) + '&';
+    if (values.blogId) query += createQueryString('blogId', values.blogId) + '&';
+    if (values.phone) query += createQueryString('phone', values.phone) + '&';
+    if (values.isReceiveOk) query += createQueryString('isReceiveOk', values.isReceiveOk) + '&';
+    if (date.from) query += createQueryString('startDate', date.from.toISOString()) + '&';
+    if (date.to) query += createQueryString('endDate', date.to.toISOString()) + '&';
 
-  useEffect(() => {
-    getTargetData({ pagination: pagination, count: showCount }).then(res => {setTargetDatas(res.data); setMaxCount(res.count)});
-  }, [pagination, showCount]);
+    if (query.endsWith('&')) {
+      query = query.slice(0, -1);
+    }
+
+    router.push(pathname + '?' + query);
+  }
 
   return (
     <div className="px-4">
@@ -121,7 +129,7 @@ export const TargetList = ({ deleteTarget, editTarget, getTargetData }) => {
         <DatePicker date={date} setDate={setDate} className={"mb-2"} />
         <Button className="md:w-[100px] w-full mb-2" onClick={() => handleSearch()}>검색</Button>
       </div>
-      <CustomTable columns={columns} rowDatas={targetDatas} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
+      <CustomTable columns={columns} rowDatas={targetDatas} count={count} />
     </div>
   )
 }

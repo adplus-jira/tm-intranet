@@ -1,24 +1,19 @@
 import { TalkTable } from "./components";
 
 
-export default async function Page() {
+export default async function Page({ searchParams }) {
 
-  const getTalkDatas = async (formData) => {
-    'use server';
-    const response = await fetch(process.env.URL + '/api/talk', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) }).then(res => res.json());
-    return response;
-  }
+  const targetResponse = await fetch(process.env.URL + '/api/talk?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ['talks'] } });
+  const targetJson = await targetResponse.json();
 
-  const userResponse = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
-  const userLists = await userResponse.json();
+  const targetDatas = targetJson.data;
+  const count = targetJson.count;
 
-  const talkResponse = await fetch(process.env.URL + '/api/talk?searchValue=aaa', { method: 'GET', next: { tags: ['talk'] } });
-  
   return (
     <div>
       <div className="flex flex-col max-w-7xl mt-5 w-full m-auto space-y-5">
         <h1 className="font-bold p-4">톡 관리</h1>
-        <TalkTable getTalkDatas={getTalkDatas} userLists={userLists} />
+        <TalkTable count={count} targetDatas={targetDatas} />
       </div>
     </div>
   )

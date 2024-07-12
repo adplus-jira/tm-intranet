@@ -5,8 +5,9 @@ export async function UserPage({ session }) {
 
   const getCardData = async () => {
     'use server';
-    const result = await fetch(process.env.URL + '/api/target/user', { method: 'POST', body: JSON.stringify({ idx: session.idx }), next: { tags: ['card'] } }).then(res => res.json()).then(res => res[0]);
-    return result;
+    const userResponse = await fetch(process.env.URL + '/api/target/user', { method: 'POST', body: JSON.stringify({ idx: session.idx }), next: { tags: ['cards'] } });
+    const result = await userResponse.json();
+    return result[0];
   }
 
   const cardData = await getCardData();
@@ -16,14 +17,15 @@ export async function UserPage({ session }) {
     const rawFormData = {
       result: formData.get('result'),
       memo: formData.get('memo'),
+      talk_memo: formData.get('talk_memo'),
       status: formData.get('status'),
       target_seq: cardData.target_seq,
       call_result_seq: cardData.call_result_seq,
       user_seq: session.idx,
     };
     await fetch(process.env.URL + '/api/dashboard/user', { method: 'PUT', body: JSON.stringify(rawFormData) });
-    revalidateTag('card');
-    revalidateTag('talk');
+    revalidateTag('cards');
+    revalidateTag('talks');
   }
 
   return (

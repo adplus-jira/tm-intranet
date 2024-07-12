@@ -56,7 +56,7 @@ export const CallCard = ({ cardDatas, handleSubmit }) => {
           <p className="col-span-3">{cardData.phone}</p>
           <p className="text-sm m-auto">추출한 url</p>
           <p className="col-span-3">{cardData.extract_url}</p>
-          <p className="text-sm m-auto">메모</p>
+          <p className="text-sm m-auto">콜 메모</p>
           <Textarea className="col-span-3" name="memo" defaultValue={cardData.memo} />
           <p className="text-sm m-auto">결과</p>
           <div className="col-span-3">
@@ -87,8 +87,9 @@ export const CallCard = ({ cardDatas, handleSubmit }) => {
                     </SelectContent>
                   </Select>
                 </div>
+                <p className="text-sm m-auto">톡 메모</p>
+                <Textarea className="col-span-3" name="talk_memo" />
               </>
-
             )
           }
           <Button className="col-span-4 mt-4" type="submit">저장</Button>

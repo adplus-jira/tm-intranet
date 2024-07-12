@@ -5,19 +5,21 @@ import { DatePicker } from "../components/customDatePicker";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { subDays } from "date-fns";
-import { CustomTable } from "../components/customTable";
+import { CustomTable } from "../components/custom-table";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useCallback } from "react";
 
 const columns = [{
   id: 'target_seq',
   label: '타겟SEQ'
 }, {
-  id: 'call_user_seq',
+  id: 'call_user_name',
   label: '전화한USER'
 }, {
   id: 'status',
   label: '상태'
 }, {
-  id: 'talk_user_seq',
+  id: 'talk_user_name',
   label: '자료보낸USER'
 }, {
   id: 'memo',
@@ -30,47 +32,47 @@ const columns = [{
   label: '업데이트날짜'
 }];
 
-export const TalkTable = ({ userLists, getTalkDatas }) => {
+export const TalkTable = ({ targetDatas, count }) => {
   const [date, setDate] = useState({
     from: subDays(new Date(), 7),
     to: new Date(),
   });
-  const [pagination, setPagination] = useState(0);
-  const [showCount, setShowCount] = useState(10);
-  const [talkList, setTalkList] = useState([]);
-  const [maxCount, setMaxCount] = useState(0);
   const [values, setValues] = useState({});
 
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const createQueryString = useCallback((name, value) => {
+    const params = new URLSearchParams();
+    params.set(name, value);
+    return params;
+  }, [searchParams]);
+
   const handleSearch = () => {
-    getTalkDatas({ ...values, startDate: date.from, endDate: date.to, pagination: 0, count: 10 }).then(res => {
-      setTalkList(res.data);
-      setMaxCount(res.count);
-      setPagination(0);
-      setShowCount(10);
-    });
+    const startDate = date.from.toISOString();
+    const endDate = date.to.toISOString();
+    let query = '';
+
+    if (values.status) query += createQueryString('status', values.status) + '&';
+    if (startDate) query += createQueryString('startDate', startDate) + '&';
+    if (endDate) query += createQueryString('endDate', endDate) + '&';
+    
+    if (query.endsWith('&')) {
+      query = query.slice(0, -1);
+    }
+
+    router.push(pathname + '?' + query);
   }
 
   const onClickReset = () => {
-    setValues({});
-    getTalkDatas({ pagination: 0, count: 10 }).then(res => {setTalkList(res.data); setMaxCount(res.count)});
+    setValues({ status: '' });
     setDate({
       from: subDays(new Date(), 7),
       to: new Date(),
-    })
-  }
-  
-  useEffect(() => {
-    getTalkDatas({ pagination: pagination, count: showCount, ...values, startDate: date.from, endDate: date.to }).then(res => {
-      const resData = res.data.map(data => {
-        const talkUser = userLists.find(user => user.idx === data.talk_user_seq);
-        const callUser = userLists.find(user => user.idx === data.call_user_seq);
-        return { ...data, talk_user_seq: talkUser?.user_name, call_user_seq: callUser?.user_name }
-      });
-
-      setTalkList(resData);
-      setMaxCount(res.count)
     });
-  }, [pagination, showCount]);
+    router.push(pathname);
+  }
   
   return (
     <div className="p-4">
@@ -89,7 +91,7 @@ export const TalkTable = ({ userLists, getTalkDatas }) => {
         <Button className="md:w-[100px] w-full mb-2" onClick={() => handleSearch()}>검색</Button>
         <Button className="md:w-[100px] w-full mb-2" onClick={() => onClickReset()}>초기화</Button>
       </div>
-    <CustomTable columns={columns} rowDatas={talkList} pagination={pagination} setPagination={setPagination} setShowCount={setShowCount} showCount={showCount} maxPage={Math.ceil(maxCount/showCount)} />
+    <CustomTable columns={columns} rowDatas={targetDatas} count={count} />
     </div>
   )
 }
