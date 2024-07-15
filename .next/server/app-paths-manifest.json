@@ -1,15 +1,4 @@
 {
-  "/user/page": "app/user/page.js",
-  "/target/page": "app/target/page.js",
-  "/call/page": "app/call/page.js",
-  "/api/user/route": "app/api/user/route.js",
-  "/talk/page": "app/talk/page.js",
-  "/api/talk/route": "app/api/talk/route.js",
   "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/api/target/user/route": "app/api/target/user/route.js",
-  "/record/page": "app/record/page.js",
-  "/api/record/[idx]/route": "app/api/record/[idx]/route.js",
-  "/api/dashboard/admin/route": "app/api/dashboard/admin/route.js",
   "/login/page": "app/login/page.js"
 }
