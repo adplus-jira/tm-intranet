@@ -19,8 +19,8 @@ export async function GET(req, context) {
 
     const r = await execQuery(`
       SELECT TK.target_seq, TK.status, TK.memo, TK.create_date, TK.update_date,
-      (SELECT user_name FROM user WHERE TK.call_user_seq = user.idx) AS call_user_name,
-      (SELECT user_name FROM user WHERE TK.talk_user_seq = user.idx) AS talk_user_name
+      (SELECT user_name FROM user WHERE TK.call_user_seq = user.user_seq) AS call_user_name,
+      (SELECT user_name FROM user WHERE TK.talk_user_seq = user.user_seq) AS talk_user_name
       FROM talk_result TK ${query} LIMIT ${count} OFFSET ${pagination * count}`);
       
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM talk_result TK ${query}`);
@@ -29,8 +29,8 @@ export async function GET(req, context) {
   } else {
     const r = await execQuery(`
       SELECT TK.target_seq, TK.status, TK.memo, TK.create_date, TK.update_date,
-      (SELECT user_name FROM user WHERE TK.call_user_seq = user.idx) AS call_user_name,
-      (SELECT user_name FROM user WHERE TK.talk_user_seq = user.idx) AS talk_user_name
+      (SELECT user_name FROM user WHERE TK.call_user_seq = user.user_seq) AS call_user_name,
+      (SELECT user_name FROM user WHERE TK.talk_user_seq = user.user_seq) AS talk_user_name
       FROM talk_result TK LIMIT ${count} OFFSET ${pagination * count}`);
 
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM talk_result TK`);

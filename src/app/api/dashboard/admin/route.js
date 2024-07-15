@@ -2,9 +2,9 @@ import { execQuery } from "../../commonApi";
 
 export async function GET() {
 
-  const res = await execQuery(`SELECT * FROM user  WHERE user_access_control = 0 ORDER BY idx ASC`);
+  const res = await execQuery(`SELECT * FROM user  WHERE user_access_control = 0 ORDER BY user_seq ASC`);
   let users = res.map(user => {
-    return { user_seq: user.idx, user_name: user.user_name + "(" + user.user_id + ")" }
+    return { user_seq: user.user_seq, user_name: user.user_name + "(" + user.user_id + ")" }
   });
   const promises = users.map(async (user) => {
     const count = await execQuery(`
@@ -23,9 +23,9 @@ export async function GET() {
 
 export async function POST(req, res) {
   const { startDate, endDate } = await req.json();
-  const userRes = await execQuery(`SELECT idx, user_name FROM user WHERE user_access_control = 0 ORDER BY idx ASC`);
+  const userRes = await execQuery(`SELECT user_seq, user_name FROM user WHERE user_access_control = 0 ORDER BY user_seq ASC`);
   let sql = '';
-  userRes.forEach(user => sql += `MAX(CASE WHEN userSeq = ${user.idx} THEN callCnt ELSE 0 END) AS '${user.user_name}', `);
+  userRes.forEach(user => sql += `MAX(CASE WHEN userSeq = ${user.user_seq} THEN callCnt ELSE 0 END) AS '${user.user_name}', `);
 
   sql = sql.replace(/,\s*$/, "");
   
@@ -42,13 +42,13 @@ export async function POST(req, res) {
     CallCounts AS (
         SELECT
             DR.day,
-            U.idx as userSeq,
+            U.user_seq as userSeq,
             COALESCE(COUNT(CR.call_result_seq), 0) AS callCnt
         FROM DateRange DR
         CROSS JOIN user U
-        LEFT JOIN call_result CR ON U.idx = CR.user_seq AND DATE(CR.create_date) = DR.day
+        LEFT JOIN call_result CR ON U.user_seq = CR.user_seq AND DATE(CR.create_date) = DR.day
         WHERE DR.day BETWEEN '${startDate}' AND '${endDate}'
-        GROUP BY DR.day, U.idx
+        GROUP BY DR.day, U.user_seq
     )
     SELECT
         day,

@@ -12,15 +12,15 @@ export async function authenticate(prevState, formData) {
   } else if (loginRes.length === 0) {
     return '아이디 또는 비밀번호가 틀렸습니다.';
   } else {
-    const user = { idx: loginRes[0].idx, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
+    const user = { user_seq: loginRes[0].user_seq, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
     await signIn('credentials', {
       id: user.id,
-      idx: user.idx,
+      user_seq: user.user_seq,
       name: user.name,
       isAdmin: user.isAdmin,
       redirect: false
     })
-    await execQuery(`UPDATE user SET last_login_date = NOW() WHERE idx = ${user.idx}`);
+    await execQuery(`UPDATE user SET last_login_date = NOW() WHERE user_seq = ${user.user_seq}`);
     redirect('/dashboard');
   }
 }

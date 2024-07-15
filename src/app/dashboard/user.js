@@ -5,7 +5,7 @@ export async function UserPage({ session }) {
 
   const getCardData = async () => {
     'use server';
-    const userResponse = await fetch(process.env.URL + '/api/target/user', { method: 'POST', body: JSON.stringify({ idx: session.idx }), next: { tags: ['cards'] } });
+    const userResponse = await fetch(process.env.URL + '/api/target/user', { method: 'POST', body: JSON.stringify({ idx: session.user_seq }), next: { tags: ['cards'] } });
     const result = await userResponse.json();
     return result[0];
   }
@@ -21,7 +21,7 @@ export async function UserPage({ session }) {
       status: formData.get('status'),
       target_seq: cardData.target_seq,
       call_result_seq: cardData.call_result_seq,
-      user_seq: session.idx,
+      user_seq: session.user_seq,
     };
     await fetch(process.env.URL + '/api/dashboard/user', { method: 'PUT', body: JSON.stringify(rawFormData) });
     revalidateTag('cards');

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import React from 'react';
 
-export const customModal = ({ idx, userId, userPw, userName, handleSubmit }) => {
+export const customModal = ({ userId, userPw, userName, handleSubmit }) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -65,7 +65,7 @@ export const customModal = ({ idx, userId, userPw, userName, handleSubmit }) => 
                 />
               </div>
             </div>
-            <input type="hidden" name="idx" value={idx} />
+            {/* <input type="hidden" name="idx" value={idx} /> */}
             <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-400" onClick={() => setOpen(false)}>완료</Button>
           </form>
         </DialogContent>

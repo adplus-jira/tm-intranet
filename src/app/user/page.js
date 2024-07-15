@@ -9,7 +9,7 @@ export async function Page({ searchParams }) {
   // const userList = await userData.json();
 
   const name = searchParams.name;
-  const userData = name ? await execQuery(`SELECT * FROM user WHERE user_name LIKE '%${name}%' AND user_access_control='0' ORDER BY idx ASC`) : await execQuery(`SELECT * FROM user WHERE user_access_control='0' ORDER BY idx ASC`);
+  const userData = name ? await execQuery(`SELECT * FROM user WHERE user_name LIKE '%${name}%' AND user_access_control='0' ORDER BY user_seq ASC`) : await execQuery(`SELECT * FROM user WHERE user_access_control='0' ORDER BY user_seq ASC`);
   revalidateTag('users');
 
   return (

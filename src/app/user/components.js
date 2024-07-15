@@ -16,22 +16,21 @@ import React from "react";
 import { customModal as CustomModal } from "./customModal";
 import Link from "next/link";
 
-const Modal = ({ idx, userId, userPw, userName }) => {
+const Modal = ({ userSeq, userId, userPw, userName }) => {
   const handleSubmit = async (formData) => {
     'use server';
     const rawFormData = {
-      idx: formData.get('idx'),
       userId: formData.get('id'),
       password: formData.get('password'),
       name: formData.get('name')
     }
-    const response = await fetch(process.env.URL + '/api/user/' + idx, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rawFormData) }).then(res => res.json());
+    const response = await fetch(process.env.URL + '/api/user/' + userSeq, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rawFormData) }).then(res => res.json());
     revalidateTag('users');
   }
 
   return (
     <>
-      <CustomModal idx={idx} userId={userId} userPw={userPw} userName={userName} handleSubmit={handleSubmit} />
+      <CustomModal userId={userId} userPw={userPw} userName={userName} handleSubmit={handleSubmit} />
     </>
   )
 }
@@ -41,17 +40,17 @@ const Modal = ({ idx, userId, userPw, userName }) => {
 const UserList = async ({ userData }) => {
   
 
-  const onDelete = async (formData) => {
-    'use server';
-    const idx = formData.get('idx');
-    const response = await fetch(process.env.URL + '/api/user/' + idx, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }).then(res => res.json());
-    revalidateTag('users');
-  }
+  // const onDelete = async (formData) => {
+  //   'use server';
+  //   const idx = formData.get('idx');
+  //   const response = await fetch(process.env.URL + '/api/user/' + idx, { method: 'DELETE', headers: { 'Content-Type': 'application/json' } }).then(res => res.json());
+  //   revalidateTag('users');
+  // }
 
   const onDisable = async (formData) => {
     'use server';
-    const idx = formData.get('idx');
-    const response = await fetch(process.env.URL + '/api/user/' + idx, { method: 'PUT', headers: { 'Content-Type': 'application/json' } }).then(res => res.json());
+    const user_seq = formData.get('user_seq');
+    const response = await fetch(process.env.URL + '/api/user/' + user_seq, { method: 'PUT', headers: { 'Content-Type': 'application/json' } }).then(res => res.json());
     revalidateTag('users');
   }
 
@@ -82,10 +81,10 @@ const UserList = async ({ userData }) => {
                 <TableCell>{user.create_date.substring(0, 10)}</TableCell>
                 <TableCell>{user.last_login_date?.substring(0,10)}</TableCell>
                 <TableCell>{user.disable_at}</TableCell>
-                <TableCell><Modal idx={user.idx} userId={user.user_id} userPw={user.user_password} userName={user.user_name} /></TableCell>
+                <TableCell><Modal userSeq={user.user_seq} userId={user.user_id} userPw={user.user_password} userName={user.user_name} /></TableCell>
                 <TableCell>
                   <form action={onDisable}>
-                    <input type="hidden" name="idx" value={user.idx} />
+                    <input type="hidden" name="user_seq" value={user.user_seq} />
                     <Button type="submit" className="w-[100px] bg-slate-500 hover:bg-slate-400" disabled={user.disable_at ? true : false}>비활성화</Button>
                   </form>
                 </TableCell>

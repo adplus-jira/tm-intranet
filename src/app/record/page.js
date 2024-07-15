@@ -4,13 +4,7 @@ import { auth } from "@/auth";
 export default async function Page ({ searchParams }) {
   const session = await auth();
 
-  // const getRecordData = async (formData) => {
-  //   'use server';
-  //   const recordDatas = await fetch(process.env.URL + '/api/record/' + session.user.idx, { method: 'POST', body: JSON.stringify(formData), next: { tags: ["record"] } }).then(res => res.json());
-    
-  //   return recordDatas;
-  // }
-  const recordResponse = await fetch(process.env.URL + '/api/record/' + session.user.idx + '?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ["records"] } });
+  const recordResponse = await fetch(process.env.URL + '/api/record/' + session.user.user_seq + '?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ["records"] } });
   const recordJson = await recordResponse.json();
   const recordDatas = recordJson.data;
   const count = recordJson.count;

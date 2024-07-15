@@ -90,7 +90,7 @@ export function CallList({ callLists, count, userList }) {
           <SelectContent>
             {
               userList && userList.map((user, index) => (
-                <SelectItem key={index} value={user.idx}>{user.user_name}({user.user_id})</SelectItem>
+                <SelectItem key={index} value={user.user_seq}>{user.user_name}({user.user_id})</SelectItem>
               ))
             }
           </SelectContent>

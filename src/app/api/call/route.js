@@ -21,12 +21,12 @@ export async function GET (req, context) {
     let query = sql.replace('AND ', '');
     query = "WHERE " + query;
 
-    const r = await execQuery(`SELECT T.*,C.*, (SELECT user_name FROM user WHERE C.user_seq = user.idx) AS user_name FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq ${query} LIMIT ${count} OFFSET ${pagination * count}`);
+    const r = await execQuery(`SELECT T.*,C.*, (SELECT user_name FROM user WHERE C.user_seq = user.user_seq) AS user_name FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq ${query} LIMIT ${count} OFFSET ${pagination * count}`);
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq ${query}`);
     revalidateTag("calls");
     return Response.json({ data: r, count: r_count[0].count });
   } else {
-    const r = await execQuery(`SELECT T.*,C.*, (SELECT user_name FROM user WHERE C.user_seq = user.idx) AS user_name FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq LIMIT ${count} OFFSET ${pagination * count}`);
+    const r = await execQuery(`SELECT T.*,C.*, (SELECT user_name FROM user WHERE C.user_seq = user.user_seq) AS user_name FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq LIMIT ${count} OFFSET ${pagination * count}`);
     const r_count = await execQuery(`SELECT COUNT(*) as 'count' FROM call_result C INNER JOIN target T ON T.target_seq = C.target_seq`);
     revalidateTag("calls");
     return Response.json({ data: r, count: r_count[0].count });
