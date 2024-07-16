@@ -1,8 +1,9 @@
+import { getServerSession } from "next-auth/next";
 import { RecordTable } from "./components";
-import { auth } from "@/auth";
+import { authOptions } from "../api/auth/[...nextauth]/route";
 
 export default async function Page ({ searchParams }) {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   const recordResponse = await fetch(process.env.URL + '/api/record/' + session.user.user_seq + '?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ["records"] } });
   const recordJson = await recordResponse.json();

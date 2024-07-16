@@ -22,8 +22,3 @@ export const execQuery = async (query) => {
     return NextResponse.error(error);
   }
 }
-
-export const getSessionData = async () => {
-  const result = await auth();
-  return result;
-}

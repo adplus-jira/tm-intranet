@@ -6,12 +6,25 @@ import { Button } from "@/components/ui/button";
 
 import { authenticate, test } from "./actions";
 import { useFormState, useFormStatus } from "react-dom";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 
 
 const Page = () => {
-  const [errorMsg, handleSubmit] = useFormState(authenticate, undefined);
-
+  const router = useRouter();
+  // const [errorMsg, handleSubmit] = useFormState(authenticate, undefined);
+  const [errorMsg, setErrorMessage] = useState();
+  const handleSubmit = async (formData) => {
+    const result = await signIn('Credentials', { id: formData.get('id'), password: formData.get('password'), redirect: false });
+    if(result.error) {
+      setErrorMessage(result.error);
+    } else {
+      setErrorMessage();
+      router.push('/dashboard');
+    }
+  }
   
   return (
     <>
@@ -20,7 +33,7 @@ const Page = () => {
       <form action={handleSubmit} className="grid gap-1.5">
         <Input type="text" name="id" placeholder="ID" />
         <Input type="password" name="password" placeholder="Password" />
-        <p>{errorMsg}</p>
+        {/* <p>{errorMsg}</p> */}
         <LoginButton />
       </form>
     </div>

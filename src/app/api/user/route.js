@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 
 
 export async function GET(req, context) {
-  const name = req.nextUrl.searchParams.get('name');
+  const name = new URLSearchParams(req.nextUrl.searchParams).get('name');
   
   if (name) {
     const res = await execQuery(`SELECT * FROM user WHERE user_name LIKE '%${name}%' AND user_access_control='0' ORDER BY user_seq ASC`);
