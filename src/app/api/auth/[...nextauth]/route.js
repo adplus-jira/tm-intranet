@@ -17,34 +17,36 @@ export const authOptions = {
         password: '',
       },
       async authorize(credentials) {
-        if (credentials.id && credentials.password) {
+        try {
+          if (credentials.id && credentials.password) {
+            const sql = 'SELECT * FROM user WHERE user_id = "' + credentials.id + '" AND user_password = "' + credentials.password + '" LIMIT 1';
+            const loginRes = await execQuery(sql);
 
-          const sql = 'SELECT * FROM user WHERE user_id = "' + credentials.id +'" AND user_password = "' + credentials.password + '" LIMIT 1';
-          const loginRes = await execQuery(sql);
-
-          if ( !credentials.id || !credentials.password ) {
-            return '아이디와 비밀번호를 입력해주세요.';
-          } else if (loginRes.length === 0) {
-            return '아이디 또는 비밀번호가 틀렸습니다.';
-          } else {
-
-            const user = { user_seq: loginRes[0].user_seq, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
-            await execQuery(`UPDATE user SET last_login_date = NOW() WHERE user_seq = ${user.user_seq}`);
-            return user;
+            if (!credentials.id || !credentials.password) {
+              throw new Error('아이디와 비밀번호를 입력해주세요.');
+            } else if (loginRes.length === 0) {
+              throw new Error('일치하는 아이디 또는 비밀번호가 없습니다.');
+            } else {
+              const user = { user_seq: loginRes[0].user_seq, id: loginRes[0].user_id, name: loginRes[0].user_name, isAdmin: loginRes[0].user_access_control ? true : false };
+              await execQuery(`UPDATE user SET last_login_date = NOW() WHERE user_seq = ${user.user_seq}`);
+              return user;
+            }
           }
+          return null;
+        } catch (error) {
+          throw new Error(error);
         }
-        return null;
       },
     }),
   ],
-  
+
   session: {
     jwt: true,
     maxAge: 1 * 24 * 60 * 60, // 1 days
   },
   callbacks: {
     // authorized({ auth, request: { nextUrl } }) {
-      
+
     //   const isLoggedIn = !!auth?.user.name;
     //   const isOnProtected = !(nextUrl.pathname.startsWith('/login'));
 

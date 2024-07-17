@@ -4,7 +4,7 @@ import { DataChart, DataLineChart } from "./components";
 
 
 export async function AdminPage() {
-  const userResponse = await fetch(process.env.URL + '/api/dashboard/admin', { method: 'GET', next: { tags: ["call", "user", "talk" ]} });
+  const userResponse = await fetch(process.env.URL+'/api/dashboard/admin', { method: 'GET', next: { tags: ["call", "user", "talk" ]} });
   const userChartData = await userResponse.json();
 
   const chartConfig = {

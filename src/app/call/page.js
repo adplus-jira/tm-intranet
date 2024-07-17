@@ -1,8 +1,8 @@
 import { CallList } from "./components";
+import { execQuery } from "../api/commonApi";
 
 export default async function Page({ searchParams }) {
-  const userListResponse = await fetch(process.env.URL + '/api/user', { method: 'GET', next: { tags: ['users'] } });
-  const userList = await userListResponse.json();
+  const userList= await execQuery(`SELECT * FROM user WHERE user_access_control='0' ORDER BY user_seq ASC`);
 
   const callResposne = await fetch(process.env.URL + '/api/call?' + new URLSearchParams(searchParams), { method: 'GET', next: { tags: ['calls'] } });
   const callList = await callResposne.json();

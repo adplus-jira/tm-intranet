@@ -4,17 +4,18 @@ import { revalidateTag } from "next/cache";
 
 
 export async function GET(req, context) {
-  const name = new URLSearchParams(req.nextUrl.searchParams).get('name');
+  // const search = new URLSearchParams(req.nextUrl.searchParams);
+  // const name = search.get('name') ? search.get('name') : '';
   
-  if (name) {
-    const res = await execQuery(`SELECT * FROM user WHERE user_name LIKE '%${name}%' AND user_access_control='0' ORDER BY user_seq ASC`);
-    revalidateTag('users');
-    return Response.json(res);
-  } else {
+  // if (name) {
+  //   const res = await execQuery(`SELECT * FROM user WHERE user_name LIKE '%` + name + `%' AND user_access_control='0' ORDER BY user_seq ASC`);
+  //   revalidateTag('users');
+  //   return Response.json(res);
+  // } else {
     const res = await execQuery(`SELECT * FROM user WHERE user_access_control='0' ORDER BY user_seq ASC`);
-    revalidateTag('users');
+    // revalidateTag('users');
     return Response.json(res);
-  }
+  // }
 }
 
 export async function POST(req, res) {
